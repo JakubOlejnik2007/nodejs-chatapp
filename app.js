@@ -6,6 +6,8 @@ const config = require('./config');
 const bcrypt = require('bcrypt')
 const app = express();
 const hbs = require('express-handlebars');
+const { isSet } = require('util/types');
+const request = require('request');
 
 let log_er = "none";
 let remembered_login = ""
@@ -31,7 +33,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'static')));
 
-app.get('/chat/login', function(request, response) {
+app.get('/chat/login', function(req, response) {
 	console.log(log_er)
     //for (i = 0; i < 10; i++){
     //    bcrypt.compare("QWERTY", bcrypt.hash("QWERTY", 10), (error, response) => {
@@ -39,24 +41,52 @@ app.get('/chat/login', function(request, response) {
     //    });
    // }
 	response.render('login', {
-		title: "Strona główna",
+		title: "Zaloguj się",
 		error: log_er,
 		login: remembered_login
 	});
 	
-	log_er = "none"
-    //response.sendFile(path.join(__dirname + '/login.html'));
+	log_er = "none";
+	remembered_login = "";
 });
-app.get('/style.css', (request, response) => {
-	response.sendFile(path.join(__dirname + '/style.css'));
-	console.log(`Załadowano: ${css} \n`);
+app.get("/chat/signup", (req, res) => {
+	res.render('signup', {
+		title: "Zaloguj się",
+		error: log_er,
+		login: remembered_login
+	});
+	
+	log_er = "none";
+	remembered_login = "";
 });
 
 app.post('/chat/login/process', (req, res) => {
+  const secretKey = config.private;
+	const verificationURL = "https://www.google.com/recaptcha/api/siteverify?secret=" + secretKey + "&response=" + req.body['g-recaptcha-response'];
+  console.log(verificationURL)
+	request(verificationURL, function (error, response, body) {
+    body = JSON.parse(body);
+	  if (body.success !== undefined && !body.success) {
+		console.log(1)
+      return res.json({"responseError" : "Failed captcha verification"});
+    }
+	  res.json({ "responseSuccess": "Sucess" });
+	  console.log(2)
+  });
+	console.log(req.body.secret)
+	if (req.body.operation == "login") {
+		if (isSet(req.body.username) && isSet(req.body.password) && !isSet(req.body.cpassword) && !isSet(req.body.email) && !isSet(req.body.captcha) && !isSet(req.body.rules)) {
+			log_er = "block";
+			remembered_login = req.body.username;
+			req.redirect("/chat/login")
+			return 1;
+		}
+	}
+	
 	let username = req.body.username;
 	let password = req.body.password;
 	
-	console.log(username, password);
+//	console.log(username, password);
 	if (!username || !password) {
 		log_er = "block";
 		remembered_login = username;
@@ -66,6 +96,10 @@ app.post('/chat/login/process', (req, res) => {
 		log_er = "none"
 	}
 		
+	if (1 == 1) {
+		req.session.isLogged = true;
+	}
+	console.log(req.session.isLogged)
 	return 0;
 	const connection = mysql.createConnection({
 		host     : config.mysql.host,
@@ -91,15 +125,15 @@ app.post('/chat/login/process', (req, res) => {
 	}
 	connection.end();
 })
-app.get('/home', function(request, response) {
-	if (request.session.loggedin) {
-		response.send('Welcome back, ' + request.session.username + '!');
+app.get('/home', function(req, res) {
+	if (req.session.loggedin) {
+		res.send('Welcome back, ' + req.session.username + '!');
 	} else {
-		response.send('Please login to view this page!');
+		res.send('Please login to view this page!');
 	}
-	response.end();
+	res.end();
 });
 
-app.listen(config.port, () => {
-	console.log(`Server is running on http://localhost:${config.port}`)
-});
+	app.listen(config.port, () => {
+		console.log(`Server is running on http://localhost:${config.port}`)
+	});

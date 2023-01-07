@@ -1,0 +1,26 @@
+{{> header}}
+<main>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <link rel="stylesheet" href="/log.css">
+    <h2>data</h2>
+    <form action="/chat/login/process" method="post">
+        <span id="login_err" style="display: {{{error}}}">
+            <h3>Nastąpił błąd podczas logowania do aplikacji!</h3>
+        </span>
+        <label for="username">Login: </label><br>
+        <input type="text" name="username" id="username" value="{{{login}}}"><br>
+        <label for="email">E-mail: </label><br>
+        <input type="email" name="email" id="email"><br>
+        <label for="password">Hasło: </label><br>
+        <input type="password" name="password" id="password"><br>
+        <label for="password">Potwierdź hasło: </label><br>
+        <input type="password" name="cpassword" id="cpassword"><br>
+        <input type="checkbox" name="rules" id="rules">
+        <label for="rules">Accept our rules</label> <br>
+        <div class="g-recaptcha" data-sitekey="6LevK90jAAAAAE_pbF1js6unbS8mgzkD4IzfRL5m"></div><br>
+        <input type="submit" value="Submit">
+        <input type="hidden" name="operation" value="login">
+    </form>
+    <a href="/chat/login"></a>
+</main>
+{{> footer}}
