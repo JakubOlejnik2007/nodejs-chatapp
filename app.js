@@ -7,6 +7,9 @@ const bcrypt = require('bcrypt')
 const app = express();
 const hbs = require('express-handlebars');
 
+let log_er = "none";
+let remembered_login = ""
+
 app.set('views', path.join(__dirname, 'views'));
 
 app.set('view engine', 'hbs');
@@ -28,15 +31,20 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'static')));
 
-app.get('/', function(request, response) {
+app.get('/chat/login', function(request, response) {
+	console.log(log_er)
     //for (i = 0; i < 10; i++){
-    //    bcrypt.compare("QWERTY", bcrypt.hash("QWERTY", 10), function(error, response) {
+    //    bcrypt.compare("QWERTY", bcrypt.hash("QWERTY", 10), (error, response) => {
     //        console.log(i, true);
     //    });
    // }
-	response.render('home', {
-		title:"Strona główna"
+	response.render('login', {
+		title: "Strona główna",
+		error: log_er,
+		login: remembered_login
 	});
+	
+	log_er = "none"
     //response.sendFile(path.join(__dirname + '/login.html'));
 });
 app.get('/style.css', (request, response) => {
@@ -44,11 +52,21 @@ app.get('/style.css', (request, response) => {
 	console.log(`Załadowano: ${css} \n`);
 });
 
-app.post('/auth', function(request, response) {
-	let username = request.body.username;
-	let password = request.body.password;
+app.post('/chat/login/process', (req, res) => {
+	let username = req.body.username;
+	let password = req.body.password;
 	
+	console.log(username, password);
+	if (!username || !password) {
+		log_er = "block";
+		remembered_login = username;
+		res.redirect("/chat/login")
+		return 1;
+	} else {
+		log_er = "none"
+	}
 		
+	return 0;
 	const connection = mysql.createConnection({
 		host     : config.mysql.host,
 		user     : config.mysql.user,

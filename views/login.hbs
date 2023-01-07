@@ -1,0 +1,17 @@
+{{> header}}
+<main>
+    <link rel="stylesheet" href="/log.css">
+    <h2>data</h2>
+    <form action="/chat/login/process" method="post">
+        <span id="login_err" style="display: {{{error}}}">
+            <h3>Nastąpił błąd podczas logowania do aplikacji!</h3>
+        </span>
+        <label for="username">Login: </label><br>
+        <input type="text" name="username" id="username" value="{{{login}}}"><br>
+        <label for="password">Hasło: </label><br>
+        <input type="password" name="password" id="password"><br>
+        <input type="submit" value="Submit">
+    </form>
+    <a href="/chat/signup"></a>
+</main>
+{{> footer}}

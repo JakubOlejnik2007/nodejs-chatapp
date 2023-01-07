@@ -1,0 +1,30 @@
+#login_err {
+    border: 2px solid firebrick;
+    background-color:darksalmon;
+    color: mintcream;
+    font-size: 0.6em;
+    border-radius: 20px;
+    padding: 15px;
+    margin: 0 auto;
+    width: 50%;
+}
+form {
+    width: 100%;
+    text-align: center;
+}
+input {
+    padding:10px;
+}
+input[type = submit]:hover {
+    transition: 0.5s ease-in-out;
+    border:1px solid seagreen;
+    color:seagreen;
+    background-color: mintcream;
+}
+input[type = submit] {
+    transition: 2s ease-in-out;
+    background-color: seagreen;
+    color: mintcream;
+    border: 1px solid seagreen;
+    margin:5px;
+}
